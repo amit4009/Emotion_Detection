@@ -1,0 +1,2 @@
+E:/MLproject2/Emotion_Detection/emotion_detection_env filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
