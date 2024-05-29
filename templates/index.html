@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #add8e6; /* Light blue */
+            background: linear-gradient(135deg, #add8e6 60%, #ffcccc 100%); /* Slight red mixture */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #file {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        #uploaded-image {
+            max-width: 300px;
+            max-height: 300px;
+            border: 2px solid #ff0000;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emotion Detection</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" id="file" accept="image/*">
+        <img id="uploaded-image" src="#" alt="Uploaded Image">
+        <button type="submit">Predict</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        $(document).ready(function() {
+            $('#file').on('change', function() {
+                var fileInput = $('#file')[0];
+                if (fileInput.files && fileInput.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#uploaded-image').attr('src', e.target.result).show();
+                    }
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            });
+
+            $('#upload-form').on('submit', function(event) {
+                event.preventDefault();
+                var formData = new FormData();
+                var fileInput = $('#file')[0];
+                if (fileInput.files && fileInput.files[0]) {
+                    formData.append('file', fileInput.files[0]);
+
+                    $.ajax({
+                        url: '/predict',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(data) {
+                            $('#result').html('<h2>Emotion: ' + data.emotion + '</h2><p>Probability: ' + data.probability.toFixed(2) + '</p>');
+                        },
+                        error: function() {
+                            $('#result').html('<p>An error occurred</p>');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
